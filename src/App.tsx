@@ -1,5 +1,10 @@
 import React from "react";
+import { Switch, Route, Link } from "react-router-dom";
 import "./App.css";
+import AboutPage from "./pages/AboutPage";
+import DiscoverMoviesPage from "./pages/DiscoverMoviesPage";
+import HomePage from "./pages/HomePage";
+import NavBar from "./components/NavBar/NavBar";
 
 /*
 import Title from "./components/Title";
@@ -37,7 +42,16 @@ const all_pokemon = [
 ];
 */
 function App() {
-  return <div className="App">hello</div>;
+  return (
+    <div className="App">
+      <NavBar />
+      <Switch>
+        <Route path="/discover" component={DiscoverMoviesPage} />
+        <Route path="/about" component={AboutPage} />
+        <Route path="/" component={HomePage} />
+      </Switch>
+    </div>
+  );
 }
 
 export default App;
