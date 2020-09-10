@@ -1,6 +1,7 @@
 import React from "react";
 import "./App.css";
 
+/*
 import Title from "./components/Title";
 import Pokemon from "./components/Pokemon/Pokemon";
 
@@ -34,32 +35,9 @@ const all_pokemon = [
     abilities: ["Intimidate", "Unnerve"],
   },
 ];
-
+*/
 function App() {
-  return (
-    <div className="App">
-      <main className="container my-5">
-        <div className="mb-4">
-          <Title content="Some Simple Title" />
-        </div>
-        <div className="row">
-          {all_pokemon.map((p) => {
-            return (
-              <div className="col-md-6 col-lg-4">
-                <Pokemon
-                  name={p.name}
-                  weight={p.weight}
-                  awesome={p.awesome}
-                  terrifying={p.terrifying}
-                  abilities={p.abilities}
-                />
-              </div>
-            );
-          })}
-        </div>
-      </main>
-    </div>
-  );
+  return <div className="App">hello</div>;
 }
 
 export default App;
