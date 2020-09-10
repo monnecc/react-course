@@ -2,6 +2,7 @@ import React from "react";
 import { Switch, Route } from "react-router-dom";
 import "./App.css";
 import AboutPage from "./pages/AboutPage";
+// import MovieDetailPage from "./pages/MovieDetailPage";
 import DiscoverMoviesPage from "./pages/DiscoverMoviesPage";
 import HomePage from "./pages/HomePage";
 import NavBar from "./components/NavBar/NavBar";
@@ -46,6 +47,7 @@ function App() {
     <div className="App">
       <NavBar />
       <Switch>
+        {/* <Route path="/discover/:imdbID" component={MovieDetailPage} /> */}
         <Route path="/discover" component={DiscoverMoviesPage} />
         <Route path="/about" component={AboutPage} />
         <Route path="/" component={HomePage} />

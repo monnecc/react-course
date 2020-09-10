@@ -1,38 +1,38 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 type SearchState =
   | { status: "idle" }
   | { status: "loading" }
-  | { status: "success"; data: any } // todo: specify the data type too
-  | { status: "error"; error: any };
+  | { status: "success"; data: Movie[] } // todo: specify the data type too
+  | { status: "error"; error: string };
+
+type ApiResult = {
+  data: ApiDataResult;
+  status: number;
+  statusText: string;
+};
+
+type ApiDataResult = {
+  Response: string;
+  Error: string;
+  Search: Movie[];
+};
+
+export type Movie = {
+  Title: string;
+  Poster: string;
+  imdbID: string;
+};
 
 export default function DiscoverMoviesPage() {
-  const [movies, setMovies] = useState([]);
+  const [movies, setMovies] = useState<Movie[]>([]);
   const [searchTextTitle, setsearchTextTitle] = useState("life");
   const [searchTextYear, setSearchTextYear] = useState("");
   const [searchState, setSearchState] = useState<SearchState>({
     status: "idle",
   });
-
-  useEffect(() => {
-    searchMovies();
-  }, []);
-
-  const searchMovies = async () => {
-    if (searchTextTitle === "") {
-      setMovies([]);
-      return;
-    }
-
-    setSearchState({ status: "loading" });
-
-    const newMovies = await getMovies();
-
-    setMovies(newMovies);
-
-    //setSearchState({ status: "success" });
-  };
 
   const getMovies = async () => {
     let url =
@@ -44,10 +44,55 @@ export default function DiscoverMoviesPage() {
       url += "&y=" + searchTextYear;
     }
 
-    const res = await axios.get(url);
+    const res: ApiResult = await axios.get(url);
+
+    if (res.status !== 200) {
+      throw new Error("Error fetching data: " + res.statusText);
+    }
+    if (res.data.Response === "False") {
+      throw new Error("Error fetching data: " + res.data.Error);
+    }
+
+    console.log(res.data.Search);
 
     return res.data.Search;
   };
+
+  async function searchMovies() {
+    if (searchTextTitle === "") {
+      setSearchState({ status: "idle" });
+      return;
+    }
+
+    setSearchState({ status: "loading" });
+
+    try {
+      const newMovies = await getMovies();
+      setSearchState({ status: "success", data: newMovies });
+    } catch (error) {
+      setSearchState({
+        status: "error",
+        error: "Error fetching data: " + error,
+      });
+    }
+  }
+
+  useEffect(() => {
+    searchMovies();
+  }, []);
+
+  useEffect(() => {
+    if (searchState.status === "idle") {
+      setMovies([]);
+    } else if (searchState.status === "loading") {
+      return;
+    } else if (searchState.status === "success") {
+      setMovies(searchState.data);
+    } else if (searchState.status === "error") {
+      setMovies([]);
+      alert(searchState.error);
+    }
+  }, [searchState]);
 
   return (
     <div>
@@ -64,12 +109,27 @@ export default function DiscoverMoviesPage() {
           onChange={(e) => setSearchTextYear(e.target.value)}
         />
         <button onClick={searchMovies}>Search</button>
-        <span>{searchState.status}</span>
+        {searchState.status === "loading" ? (
+          <span>{searchState.status}</span>
+        ) : null}
       </p>
       <ul>
-        {movies.map((m: any) => {
-          return <li key={m.Title}>{m.Title}</li>;
-        })}
+        {searchState.status === "success"
+          ? movies.map((m: Movie) => {
+              return (
+                <li key={m.Title}>
+                  <div>
+                    <div>
+                      <span>{m.Title}</span>
+                    </div>
+                    <Link to={"/discover/" + m.imdbID}>
+                      <img src={m.Poster} alt={m.Title} />
+                    </Link>
+                  </div>
+                </li>
+              );
+            })
+          : null}
       </ul>
     </div>
   );
